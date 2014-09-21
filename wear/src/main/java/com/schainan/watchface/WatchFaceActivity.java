@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
@@ -39,30 +40,39 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
     private Paint mMinuteHandPaint;
     private Paint mSecondHandPaint;
 
+    private Paint mCirclePaint;
+
     private Timer mTimer = new Timer("seconds");
 
     private static final int TICK_START = 120;
     private static final int TICK_LENGTH = 30;
     private static final float MINOR_TICK_WIDTH = 1f;
     private static final float MAJOR_TICK_WIDTH = 2f;
-    private static final int HOUR_HAND_LENGTH = 70;
-    private static final float HOUR_HAND_WIDTH = 8f;
+
+    private static final int HOUR_HAND_LENGTH = 60;
+    private static final float HOUR_HAND_WIDTH = 7f;
+
     private static final int MINUTE_HAND_LENGTH = 95;
-    private static final float MINUTE_HAND_WIDTH = 5f;
+    private static final float MINUTE_HAND_WIDTH = 4f;
+
     private static final int SECOND_HAND_LENGTH = 92;
     private static final float SECOND_HAND_WIDTH = 3f;
 
 
-    public BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context arg0, Intent intent) {
-            onDraw();
-        }
-    };
+//    public BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context arg0, Intent intent) {
+//            onDraw();
+//        }
+//    };
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (mTimer == null) {
+            mTimer = new Timer("seconds");
+        }
 
         mTimer.schedule(new TimerTask() {
             @Override
@@ -77,6 +87,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         super.onPause();
 
         mTimer.cancel();
+        mTimer = null;
     }
 
     @Override
@@ -127,12 +138,16 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mSecondHandPaint.setStyle(Style.STROKE);
         mSecondHandPaint.setStrokeCap(Cap.ROUND);
         mSecondHandPaint.setStrokeWidth(SECOND_HAND_WIDTH);
+
+        mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCirclePaint.setAntiAlias(true);
+        mCirclePaint.setColor(Color.WHITE);
+        mCirclePaint.setStyle(Style.FILL);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mTimeInfoReceiver);
     }
 
     @Override
@@ -197,6 +212,11 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         // Now for the hands!
 
+        float whiteCircleRadius = 6f;
+        mCirclePaint.setColor(Color.WHITE);
+        RectF whiteCircle = new RectF(CENTER - whiteCircleRadius, CENTER - whiteCircleRadius, CENTER + whiteCircleRadius, CENTER + whiteCircleRadius);
+        mCanvas.drawOval(whiteCircle, mCirclePaint);
+
         float hourRotate = 180 + 0.5f * (60 * hour + minute);
         path.reset();
         path.moveTo(CENTER, CENTER);
@@ -225,6 +245,17 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mCanvas.rotate(secondRotate, CENTER, CENTER);
         mCanvas.drawPath(path, mSecondHandPaint);
         mCanvas.restore();
+
+        float yellowCircleRadius = 5f;
+        mCirclePaint.setColor(0xFFF9E31B);
+        RectF yellowCircle = new RectF(CENTER - yellowCircleRadius, CENTER - yellowCircleRadius, CENTER + yellowCircleRadius, CENTER + yellowCircleRadius);
+        mCanvas.drawOval(yellowCircle, mCirclePaint);
+
+
+        float blackCircleRadius = 1f;
+        mCirclePaint.setColor(Color.BLACK);
+        RectF blackCircle = new RectF(CENTER - blackCircleRadius, CENTER - blackCircleRadius, CENTER + blackCircleRadius, CENTER + blackCircleRadius);
+        mCanvas.drawOval(blackCircle, mCirclePaint);
 
 //        Log.d("asdf", "hour: " + hour + " " + hourRotate);
 //        Log.d("asdf", "minute: " + minute + " " + minuteRotate);
