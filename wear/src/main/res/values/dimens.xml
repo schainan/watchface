@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="battery_radius">30dp</dimen>
+    <dimen name="battery_offset">22dp</dimen>
+
+
+    <dimen name="tick_start">85dp</dimen>
+    <dimen name="tick_length">26dp</dimen>
+
+    <dimen name="hour_hand_length">38dp</dimen>
+    <dimen name="minute_hand_length">64dp</dimen>
+    <dimen name="second_hand_length">63dp</dimen>
+</resources>
