@@ -17,15 +17,15 @@
         android:textColor="@color/white"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="11sp"
-        android:layout_marginTop="60dp"/>
+        android:textSize="10sp"
+        android:layout_marginTop="70dp"/>
 
     <ImageView
-        android:layout_width="15dp"
+        android:layout_width="14dp"
         android:layout_height="15dp"
-        android:scaleType="fitCenter"
+        android:scaleType="fitXY"
         android:src="@drawable/ic_battery"
         android:layout_gravity="center"
-        android:layout_marginTop="37dp"
-        android:layout_marginLeft="37dp"/>
+        android:layout_marginTop="42dp"
+        android:layout_marginLeft="42dp"/>
 </merge>

@@ -11,7 +11,7 @@ import android.widget.TextView;
 public class TypefaceManager {
 
     private static TypefaceManager sInstance;
-    private Typeface mLatoLight, mLatoRegular;
+    private Typeface mLight, mRegular;
 
 
     public static TypefaceManager get() {
@@ -26,16 +26,12 @@ public class TypefaceManager {
     }
 
     private TypefaceManager(Context context) {
-        mLatoLight = Typeface.createFromAsset(context.getAssets(), "Lato-Light.ttf");
-        mLatoRegular = Typeface.createFromAsset(context.getAssets(), "Lato-Regular.ttf");
+        mLight = Typeface.createFromAsset(context.getAssets(), "Roboto-Light.ttf");
+        mRegular = Typeface.createFromAsset(context.getAssets(), "Roboto-Medium.ttf");
     }
 
-    public Typeface getTypefaceLatoLight() {
-        return mLatoLight;
-    }
-
-    public Typeface getTypefaceLatoRegular() {
-        return mLatoRegular;
+    public Typeface getTypefaceRegular() {
+        return mRegular;
     }
 
     private TypefaceManager setTypeface(Typeface typeface, TextView... textViews) {
@@ -47,7 +43,7 @@ public class TypefaceManager {
         return sInstance;
     }
 
-    public TypefaceManager setTypefaceLatoLight(TextView... textViews) {
-        return setTypeface(mLatoLight, textViews);
+    public TypefaceManager setTypefaceLight(TextView... textViews) {
+        return setTypeface(mLight, textViews);
     }
 }

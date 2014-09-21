@@ -12,14 +12,10 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
 import android.text.SpannableStringBuilder;
-import android.text.format.DateFormat;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -120,13 +116,13 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         mTenMinutePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTenMinutePaint.setAntiAlias(true);
-        mTenMinutePaint.setColor(0xAAFFFFFF);
+        mTenMinutePaint.setColor(0x55FFFFFF);
         mTenMinutePaint.setStyle(Style.STROKE);
         mTenMinutePaint.setStrokeWidth(MINOR_TICK_WIDTH);
 
         mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHourPaint.setAntiAlias(true);
-        mHourPaint.setColor(Color.WHITE);
+        mHourPaint.setColor(0xDDFFFFFF);
         mHourPaint.setStyle(Style.STROKE);
         mHourPaint.setStrokeWidth(MAJOR_TICK_WIDTH);
 
@@ -164,7 +160,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         mFaintBatteryPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mFaintBatteryPaint.setAntiAlias(true);
-        mFaintBatteryPaint.setColor(0x66FFFFFF);
+        mFaintBatteryPaint.setColor(0x40FFFFFF);
         mFaintBatteryPaint.setStyle(Style.STROKE);
         mFaintBatteryPaint.setStrokeWidth(MINOR_TICK_WIDTH);
     }
@@ -210,6 +206,9 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         int tickStart = getResources().getDimensionPixelSize(R.dimen.tick_start);
         int tickLength = getResources().getDimensionPixelSize(R.dimen.tick_length);
+
+        int tickStartMinor = getResources().getDimensionPixelSize(R.dimen.tick_start_minor);
+        int tickLengthMinor = getResources().getDimensionPixelSize(R.dimen.tick_length_minor);
         for (int i = 0; i < 12; i++) {
             float rotate = i * 30; // degrees
 
@@ -223,71 +222,20 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             mCanvas.restore();
         }
 
-        for (int i = 0; i < 60; i++) {
-            float rotate = i * 6;
+        for (int i = 0; i < 48; i++) {
+            float rotate = i * 7.5f;
 
             if (((int) rotate) % 30 == 0) continue;
 
             // Draw hour indicators
             path.reset();
-            path.moveTo(CENTER, CENTER + tickStart);
-            path.lineTo(CENTER, CENTER + tickStart + tickLength);
+            path.moveTo(CENTER, CENTER + tickStartMinor);
+            path.lineTo(CENTER, CENTER + tickStartMinor + tickLengthMinor);
             mCanvas.save();
             mCanvas.rotate(rotate, CENTER, CENTER);
             mCanvas.drawPath(path, mTenMinutePaint);
             mCanvas.restore();
         }
-
-        // Now for the hands!
-
-        float whiteCircleRadius = 8f;
-        mCirclePaint.setColor(Color.WHITE);
-        RectF whiteCircle = new RectF(CENTER - whiteCircleRadius, CENTER - whiteCircleRadius, CENTER + whiteCircleRadius, CENTER + whiteCircleRadius);
-        mCanvas.drawOval(whiteCircle, mCirclePaint);
-
-        int hourHandLength = getResources().getDimensionPixelSize(R.dimen.hour_hand_length);
-        int minuteHandLength = getResources().getDimensionPixelSize(R.dimen.minute_hand_length);
-        int secondHandLength = getResources().getDimensionPixelSize(R.dimen.second_hand_length);
-        float hourRotate = 180 + 0.5f * (60 * hour + minute);
-        path.reset();
-        path.moveTo(CENTER, CENTER);
-        path.lineTo(CENTER, CENTER + hourHandLength);
-        mCanvas.save();
-        mCanvas.rotate(hourRotate, CENTER, CENTER);
-        mCanvas.drawPath(path, mHourHandPaint);
-        mCanvas.restore();
-
-
-        float minuteRotate = 180 + minute * 6;
-        path.reset();
-        path.moveTo(CENTER, CENTER);
-        path.lineTo(CENTER, CENTER + minuteHandLength);
-        mCanvas.save();
-        mCanvas.rotate(minuteRotate, CENTER, CENTER);
-        mCanvas.drawPath(path, mMinuteHandPaint);
-        mCanvas.restore();
-
-
-        float secondRotate = 180 + second * 6;
-        path.reset();
-        path.moveTo(CENTER, CENTER);
-        path.lineTo(CENTER, CENTER + secondHandLength);
-        mCanvas.save();
-        mCanvas.rotate(secondRotate, CENTER, CENTER);
-        mCanvas.drawPath(path, mSecondHandPaint);
-        mCanvas.restore();
-
-        float yellowCircleRadius = 6f;
-        mCirclePaint.setColor(0xFFF9E31B);
-        RectF yellowCircle = new RectF(CENTER - yellowCircleRadius, CENTER - yellowCircleRadius, CENTER + yellowCircleRadius, CENTER + yellowCircleRadius);
-        mCanvas.drawOval(yellowCircle, mCirclePaint);
-
-
-        float blackCircleRadius = 1.5f;
-        mCirclePaint.setColor(Color.BLACK);
-        RectF blackCircle = new RectF(CENTER - blackCircleRadius, CENTER - blackCircleRadius, CENTER + blackCircleRadius, CENTER + blackCircleRadius);
-        mCanvas.drawOval(blackCircle, mCirclePaint);
-
 
         // Battery
         if (mBatteryLevel >= 0) {
@@ -312,6 +260,56 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             mCanvas.drawPath(path, mFaintBatteryPaint);
         }
 
+        // Now for the hands!
+
+        float whiteCircleRadius = 9.5f;
+        mCirclePaint.setColor(Color.WHITE);
+        RectF whiteCircle = new RectF(CENTER - whiteCircleRadius, CENTER - whiteCircleRadius, CENTER + whiteCircleRadius, CENTER + whiteCircleRadius);
+        mCanvas.drawOval(whiteCircle, mCirclePaint);
+
+        int hourHandLength = getResources().getDimensionPixelSize(R.dimen.hour_hand_length);
+        int minuteHandLength = getResources().getDimensionPixelSize(R.dimen.minute_hand_length);
+        int secondHandLength = getResources().getDimensionPixelSize(R.dimen.second_hand_length);
+        float hourRotate = 180 + 0.5f * (60 * hour + minute);
+        path.reset();
+        path.moveTo(CENTER, CENTER);
+        path.lineTo(CENTER, CENTER + hourHandLength);
+        mCanvas.save();
+        mCanvas.rotate(hourRotate, CENTER, CENTER);
+        mCanvas.drawPath(path, mHourHandPaint);
+        mCanvas.restore();
+
+
+        float minuteRotate = 180 + ((6f * minute + (second / 10f)));
+        path.reset();
+        path.moveTo(CENTER, CENTER);
+        path.lineTo(CENTER, CENTER + minuteHandLength);
+        mCanvas.save();
+        mCanvas.rotate(minuteRotate, CENTER, CENTER);
+        mCanvas.drawPath(path, mMinuteHandPaint);
+        mCanvas.restore();
+
+
+        float secondRotate = 180 + second * 6;
+        path.reset();
+        path.moveTo(CENTER, CENTER);
+        path.lineTo(CENTER, CENTER + secondHandLength);
+        mCanvas.save();
+        mCanvas.rotate(secondRotate, CENTER, CENTER);
+        mCanvas.drawPath(path, mSecondHandPaint);
+        mCanvas.restore();
+
+        float yellowCircleRadius = 7f;
+        mCirclePaint.setColor(0xFFF9E31B);
+        RectF yellowCircle = new RectF(CENTER - yellowCircleRadius, CENTER - yellowCircleRadius, CENTER + yellowCircleRadius, CENTER + yellowCircleRadius);
+        mCanvas.drawOval(yellowCircle, mCirclePaint);
+
+
+        float blackCircleRadius = 1.5f;
+        mCirclePaint.setColor(Color.BLACK);
+        RectF blackCircle = new RectF(CENTER - blackCircleRadius, CENTER - blackCircleRadius, CENTER + blackCircleRadius, CENTER + blackCircleRadius);
+        mCanvas.drawOval(blackCircle, mCirclePaint);
+
 //        Log.d("asdf", "hour: " + hour + " " + hourRotate);
 //        Log.d("asdf", "minute: " + minute + " " + minuteRotate);
 //        Log.d("asdf", "second: " + second + " " + secondRotate);
@@ -327,10 +325,10 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
                 // bold month
                 SpannableStringBuilder sb = new SpannableStringBuilder(date);
                 if (parts[0] != null) {
-                    sb.setSpan(new TypefaceSpan(TypefaceManager.get().getTypefaceLatoRegular()), 0, parts[0].length(), 0);
+                    sb.setSpan(new TypefaceSpan(TypefaceManager.get().getTypefaceRegular()), 0, parts[0].length(), 0);
                 }
 
-                TypefaceManager.get().setTypefaceLatoLight(tvDate);
+                TypefaceManager.get().setTypefaceLight(tvDate);
                 tvDate.setText(sb);
             }
         });
