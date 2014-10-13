@@ -11,12 +11,14 @@ import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
@@ -32,7 +34,7 @@ import java.util.TimerTask;
 
 public class WatchFaceActivity extends Activity implements SurfaceHolder.Callback {
 
-    private static final int CENTER = 160;
+    private static int CENTER;
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Canvas mCanvas;
@@ -203,6 +205,12 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mCanvas.drawColor(Color.BLACK);
 
         Path path = new Path();
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        CENTER = size.x / 2;
 
         int tickStart = getResources().getDimensionPixelSize(R.dimen.tick_start);
         int tickLength = getResources().getDimensionPixelSize(R.dimen.tick_length);
