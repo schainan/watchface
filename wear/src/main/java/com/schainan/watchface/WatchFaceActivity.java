@@ -338,7 +338,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         @Override
         public void onReceive(Context ctxt, Intent intent) {
             mBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            Log.d("asdf", "battery: " + mBatteryLevel);
+//            Log.d("asdf", "battery: " + mBatteryLevel);
             onDraw();
         }
     };
