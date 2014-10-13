@@ -55,7 +55,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
     private final float MINOR_TICK_WIDTH = 1f;
     private final float MAJOR_TICK_WIDTH = 2f;
 
-    private final float HOUR_HAND_WIDTH = 7f;
+    private final float HOUR_HAND_WIDTH = 6f;
 
     private final float MINUTE_HAND_WIDTH = 5f;
 
@@ -262,7 +262,10 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         // Now for the hands!
 
-        float whiteCircleRadius = 9.5f;
+        float whiteCircleRadius = 8.5f;
+        float yellowCircleRadius = 6f;
+        float blackCircleRadius = 1.5f;
+
         mCirclePaint.setColor(Color.WHITE);
         RectF whiteCircle = new RectF(CENTER - whiteCircleRadius, CENTER - whiteCircleRadius, CENTER + whiteCircleRadius, CENTER + whiteCircleRadius);
         mCanvas.drawOval(whiteCircle, mCirclePaint);
@@ -299,13 +302,11 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mCanvas.drawPath(path, mSecondHandPaint);
         mCanvas.restore();
 
-        float yellowCircleRadius = 7f;
         mCirclePaint.setColor(0xFFF9E31B);
         RectF yellowCircle = new RectF(CENTER - yellowCircleRadius, CENTER - yellowCircleRadius, CENTER + yellowCircleRadius, CENTER + yellowCircleRadius);
         mCanvas.drawOval(yellowCircle, mCirclePaint);
 
 
-        float blackCircleRadius = 1.5f;
         mCirclePaint.setColor(Color.BLACK);
         RectF blackCircle = new RectF(CENTER - blackCircleRadius, CENTER - blackCircleRadius, CENTER + blackCircleRadius, CENTER + blackCircleRadius);
         mCanvas.drawOval(blackCircle, mCirclePaint);

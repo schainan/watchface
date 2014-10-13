@@ -10,7 +10,7 @@
     <dimen name="tick_start_minor">93dp</dimen>
     <dimen name="tick_length_minor">20dp</dimen>
 
-    <dimen name="hour_hand_length">39dp</dimen>
-    <dimen name="minute_hand_length">67dp</dimen>
-    <dimen name="second_hand_length">66dp</dimen>
+    <dimen name="hour_hand_length">44dp</dimen>
+    <dimen name="minute_hand_length">72dp</dimen>
+    <dimen name="second_hand_length">71dp</dimen>
 </resources>
