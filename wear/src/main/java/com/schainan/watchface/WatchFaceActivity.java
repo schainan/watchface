@@ -54,7 +54,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
     SimpleDateFormat df = new SimpleDateFormat("LLL d");
 
-    private final float MINOR_TICK_WIDTH = 1f;
+    private final float MINOR_TICK_WIDTH = 2f;
     private final float MAJOR_TICK_WIDTH = 2f;
 
     private final float HOUR_HAND_WIDTH = 6f;
@@ -118,7 +118,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         mTenMinutePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTenMinutePaint.setAntiAlias(true);
-        mTenMinutePaint.setColor(0x55FFFFFF);
+        mTenMinutePaint.setColor(0x33FFFFFF);
         mTenMinutePaint.setStyle(Style.STROKE);
         mTenMinutePaint.setStrokeWidth(MINOR_TICK_WIDTH);
 
@@ -230,8 +230,10 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             mCanvas.restore();
         }
 
-        for (int i = 0; i < 48; i++) {
-            float rotate = i * 7.5f;
+        int tickmarksPerTenMinutes = 4;
+
+        for (int i = 0; i < tickmarksPerTenMinutes * 12; i++) {
+            float rotate = i * 30f / tickmarksPerTenMinutes;
 
             if (((int) rotate) % 30 == 0) continue;
 
