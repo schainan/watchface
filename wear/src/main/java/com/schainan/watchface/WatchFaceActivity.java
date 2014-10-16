@@ -15,6 +15,7 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.wearable.view.WatchViewStub;
@@ -77,7 +78,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
     private final float MINOR_TICK_WIDTH = 2f;
     private final float MAJOR_TICK_WIDTH = 2f;
 
-    private final float HOUR_HAND_WIDTH = 6f;
+    private final float HOUR_HAND_WIDTH = 7f;
 
     private final float MINUTE_HAND_WIDTH = 5f;
 
@@ -171,7 +172,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
     private void updatePaints() {
         mTenMinutePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTenMinutePaint.setAntiAlias(true);
-        mTenMinutePaint.setColor(0x33FFFFFF);
+        mTenMinutePaint.setColor(0x44FFFFFF);
         mTenMinutePaint.setStyle(Style.STROKE);
         mTenMinutePaint.setStrokeWidth(MINOR_TICK_WIDTH);
 
@@ -268,7 +269,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             mCanvas.restore();
         }
 
-        int tickmarksPerTenMinutes = 4;
+        int tickmarksPerTenMinutes = 5;
 
         for (int i = 0; i < tickmarksPerTenMinutes * 12; i++) {
             float rotate = i * 30f / tickmarksPerTenMinutes;
@@ -294,9 +295,9 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             path.moveTo(CENTER + offset, CENTER + offset);
             path.addArc(batteryOval, 270, mBatteryLevel * 3.6f);
             if (mBatteryLevel > 90) {
-                mBatteryPaint.setColor(0xFF96CA2D);
+                mBatteryPaint.setColor(0xFF5CC12F);
             } else if (mBatteryLevel <= 10) {
-                mBatteryPaint.setColor(0xFFDC3522);
+                mBatteryPaint.setColor(0xFFFF3C2D);
             } else {
                 mBatteryPaint.setColor(Color.WHITE);
             }

@@ -4,14 +4,14 @@
     <dimen name="battery_offset">22dp</dimen>
 
 
-    <dimen name="tick_start">93dp</dimen>
+    <dimen name="tick_start">95dp</dimen>
     <dimen name="tick_length">22dp</dimen>
 
-    <dimen name="tick_start_minor">95dp</dimen>
-    <dimen name="tick_length_minor">20dp</dimen>
+    <dimen name="tick_start_minor">106dp</dimen>
+    <dimen name="tick_length_minor">12dp</dimen>
 
-    <dimen name="hour_hand_length">44dp</dimen>
-    <dimen name="minute_hand_length">74dp</dimen>
-    <dimen name="second_hand_length">74dp</dimen>
-    <dimen name="second_hand_minor_length">9dp</dimen>
+    <dimen name="hour_hand_length">54dp</dimen>
+    <dimen name="minute_hand_length">88dp</dimen>
+    <dimen name="second_hand_length">88dp</dimen>
+    <dimen name="second_hand_minor_length">10dp</dimen>
 </resources>
