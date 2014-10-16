@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,6 +16,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.wearable.view.WatchViewStub;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
@@ -23,6 +25,15 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 import com.schainan.watchface.font.TypefaceManager;
 import com.schainan.watchface.font.TypefaceSpan;
 
@@ -32,7 +43,13 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class WatchFaceActivity extends Activity implements SurfaceHolder.Callback {
+public class WatchFaceActivity extends Activity implements SurfaceHolder.Callback,
+        ConnectionCallbacks, OnConnectionFailedListener, DataApi.DataListener,
+        MessageApi.MessageListener {
+
+    private static final String TAG = "WatchFaceActivity";
+    private static final String SECOND_HAND_COLOR_KEY = "secondhandcolor";
+    private GoogleApiClient mGoogleApiClient;
 
     private static int CENTER;
     private SurfaceView mSurfaceView;
@@ -50,7 +67,10 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
     private Paint mBatteryPaint;
     private Paint mFaintBatteryPaint;
 
+    private int mColor = -1;
+
     private Timer mTimer = new Timer("seconds");
+
 
     SimpleDateFormat df = new SimpleDateFormat("LLL d");
 
@@ -110,12 +130,45 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             }
         });
 
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
+
         TypefaceManager.init(this);
 
         IntentFilter batteryFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         mBatInfoReceiver.onReceive(this, registerReceiver(null, batteryFilter));
         registerReceiver(this.mBatInfoReceiver, batteryFilter);
 
+        updatePaints();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(mBatInfoReceiver);
+
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mSurfaceHolder = holder;
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        mSurfaceHolder = holder;
+        onDraw();
+    }
+
+    private void updatePaints() {
         mTenMinutePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTenMinutePaint.setAntiAlias(true);
         mTenMinutePaint.setColor(0x33FFFFFF);
@@ -142,9 +195,14 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mMinuteHandPaint.setStrokeCap(Cap.ROUND);
         mMinuteHandPaint.setStrokeWidth(MINUTE_HAND_WIDTH);
 
+        if (mColor == -1) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            mColor = prefs.getInt(SECOND_HAND_COLOR_KEY, getResources().getColor(R.color.secondhand_yellow));
+        }
+
         mSecondHandPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mSecondHandPaint.setAntiAlias(true);
-        mSecondHandPaint.setColor(0xFFF9E31B);
+        mSecondHandPaint.setColor(mColor);
         mSecondHandPaint.setStyle(Style.STROKE);
         mSecondHandPaint.setStrokeCap(Cap.ROUND);
         mSecondHandPaint.setStrokeWidth(SECOND_HAND_WIDTH);
@@ -166,26 +224,6 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         mFaintBatteryPaint.setStyle(Style.STROKE);
         mFaintBatteryPaint.setStrokeWidth(MINOR_TICK_WIDTH);
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unregisterReceiver(mBatInfoReceiver);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mSurfaceHolder = holder;
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        mSurfaceHolder = holder;
-        onDraw();
-    }
-
-
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -283,6 +321,7 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
         int hourHandLength = getResources().getDimensionPixelSize(R.dimen.hour_hand_length);
         int minuteHandLength = getResources().getDimensionPixelSize(R.dimen.minute_hand_length);
         int secondHandLength = getResources().getDimensionPixelSize(R.dimen.second_hand_length);
+        int secondHandMinorLength = getResources().getDimensionPixelSize(R.dimen.second_hand_minor_length);
         float hourRotate = 180 + 0.5f * (60 * hour + minute);
         path.reset();
         path.moveTo(CENTER, CENTER);
@@ -305,14 +344,14 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
 
         float secondRotate = 180 + second * 6;
         path.reset();
-        path.moveTo(CENTER, CENTER);
+        path.moveTo(CENTER, CENTER - secondHandMinorLength);
         path.lineTo(CENTER, CENTER + secondHandLength);
         mCanvas.save();
         mCanvas.rotate(secondRotate, CENTER, CENTER);
         mCanvas.drawPath(path, mSecondHandPaint);
         mCanvas.restore();
 
-        mCirclePaint.setColor(0xFFF9E31B);
+        mCirclePaint.setColor(mColor);
         RectF yellowCircle = new RectF(CENTER - yellowCircleRadius, CENTER - yellowCircleRadius, CENTER + yellowCircleRadius, CENTER + yellowCircleRadius);
         mCanvas.drawOval(yellowCircle, mCirclePaint);
 
@@ -353,4 +392,44 @@ public class WatchFaceActivity extends Activity implements SurfaceHolder.Callbac
             onDraw();
         }
     };
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "onConnected(): Successfully connected to Google API client");
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended(): Connection to Google API client was suspended");
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        Log.d(TAG, "onDataChanged: " + dataEvents);
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.d(TAG, "onMessageReceived: " + messageEvent);
+        if ("/color".equals(messageEvent.getPath())) {
+            byte[] data = messageEvent.getData();
+            mColor = byteArrayToColor(data);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            prefs.edit().putInt(SECOND_HAND_COLOR_KEY, mColor).commit();
+            updatePaints();
+            onDraw();
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e(TAG, "onConnectionFailed(): Failed to connect, with result: " + result);
+    }
+
+    private int byteArrayToColor(byte[] data) {
+        String colorValue = new String(data);
+        return Integer.parseInt(colorValue);
+    }
 }

@@ -2,4 +2,10 @@
     <string name="app_name">Charge Watchface</string>
     <string name="ab_title">Charge Watchface Settings</string>
     <string name="no_customize_string">Customization options coming soon!</string>
+    <string name="customize_secondhand_color">Accent</string>
+    <!-- Content description for a color square. -->
+    <string name="color_swatch_description">Color %1$d</string>
+    <!-- Content description for a selected color square. -->
+    <string name="color_swatch_description_selected">Color %1$d selected</string>
+
 </resources>
